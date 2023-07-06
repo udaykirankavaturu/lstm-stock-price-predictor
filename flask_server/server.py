@@ -24,6 +24,18 @@ def predict():
     # Get the input data from the request
     data = request.json['data']
 
+    if not data:
+        return {
+            'status_code': 400,
+            'message': 'data is required'
+        }
+
+    if 'symbol' not in data:
+        return {
+            'status_code': 400,
+            'message': 'symbol is required'
+        }
+
     symbol = data['symbol']
     stock_data = yf.download(f'{symbol}', start="2010-01-01", end=(
         datetime.now().date() + timedelta(days=1)).strftime("%Y-%m-%d"))
@@ -54,14 +66,19 @@ def predict():
         # Return the predictions in the API response
         response = {
             'status_code': 200,
-            'message': 'success',
+            'message': 'Success',
             'symbol': symbol,
             'last_closing_date': last_closing_date,
             'last_closing_price': last_closing_price,
-            'next_predicted_closing_price': next_predicted_closing_price}
+            'next_predicted_closing_price': next_predicted_closing_price
+        }
         return jsonify(response)
     else:
-        return "No data found"
+        return {
+            'status_code': 200,
+            'message': 'No data found',
+            'symbol': symbol
+        }
 
 
 if __name__ == '__main__':

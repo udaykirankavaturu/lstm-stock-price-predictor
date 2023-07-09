@@ -7,3 +7,8 @@ fileignoreconfig:
 - filename: app/package-lock.json
   checksum: 42fb2f2335bb64c6a5fa8c319519b2790884459df340d9ff6bce76b306946556
 version: ""
+
+fileignoreconfig:
+- filename: app/src/components/search.js
+  checksum: d02cd1d19118bc8db1693c6c20d2fe79a16167b597a625f8a143f9d5ef3e24ff
+version: ""

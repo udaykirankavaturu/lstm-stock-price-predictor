@@ -2,3 +2,8 @@ fileignoreconfig:
 - filename: lstm-stock-price-predictor.ipynb
   checksum: 6034fafbb302057a0b8060004ba90e82dbd64a4212c9c1a95a499cc32ce88fc5
 version: ""
+
+fileignoreconfig:
+- filename: app/package-lock.json
+  checksum: 42fb2f2335bb64c6a5fa8c319519b2790884459df340d9ff6bce76b306946556
+version: ""

@@ -25,6 +25,18 @@ def predict():
         # Get the input data from the request
         data = request.json['data']
 
+        if not data:
+            return {
+            'status_code': 400,
+            'message': 'data is required'
+        }
+
+        if 'symbol' not in data:
+            return {
+                'status_code': 400,
+                'message': 'symbol is required'
+            }
+
         symbol = data['symbol']
         stock_data = yf.download(f'{symbol}', start="2010-01-01", end=(
             datetime.now().date() + timedelta(days=1)).strftime("%Y-%m-%d"))

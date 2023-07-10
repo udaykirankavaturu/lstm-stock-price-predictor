@@ -12,3 +12,8 @@ fileignoreconfig:
 - filename: app/src/components/search.js
   checksum: d02cd1d19118bc8db1693c6c20d2fe79a16167b597a625f8a143f9d5ef3e24ff
 version: ""
+
+fileignoreconfig:
+- filename: app/src/components/search.js
+  checksum: f2e5858f71ab2d59874e61c6761bd58b9a3b5ad10728b328c5adc896bc80a647
+version: ""

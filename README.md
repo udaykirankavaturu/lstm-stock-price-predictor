@@ -7,3 +7,4 @@
 - Pandas
 - NumPy
 - Matplotlib
+- flask-cors

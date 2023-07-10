@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+from flask import Flask
+from flask_cors import CORS
 import tensorflow as tf
 import numpy as np
 import yfinance as yf
@@ -7,6 +9,7 @@ from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
+CORS(app)
 
 # Load the LSTM model
 model_path = '../model'
@@ -22,6 +25,14 @@ scaler = MinMaxScaler(feature_range=(0, 1))
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
+        if request.method == 'OPTIONS':
+            # Handle preflight request
+            response = jsonify({})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+            response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')
+            return response 
+
         # Get the input data from the request
         data = request.json['data']
 
@@ -38,6 +49,32 @@ def predict():
             }
 
         symbol = data['symbol']
+        exchange = data['exchange']
+
+        if exchange == 'NSE':
+            symbol = symbol + '.NS'
+
+        if exchange == 'BSE':
+            symbol = symbol + '.BO'
+
+        if exchange == 'NYSE':
+            symbol = symbol + '.N'
+
+        if exchange == 'SHANGHAI':
+            symbol = symbol + '.SS'
+        
+        if exchange == 'SHENZHEN':
+            symbol = symbol + '.SZ'
+
+        if exchange == 'JAPAN':
+            symbol = symbol + '.JP'
+
+        if exchange == 'EUROPE':
+            symbol = symbol + '.E'
+        
+        if exchange == 'LONDON':
+            symbol = symbol + '.L'
+
         stock_data = yf.download(f'{symbol}', start="2010-01-01", end=(
             datetime.now().date() + timedelta(days=1)).strftime("%Y-%m-%d"))
 
@@ -67,6 +104,7 @@ def predict():
                 'status_code': 200,
                 'message': 'success',
                 'data': {
+                    'exchange': exchange,
                     'symbol': symbol,
                     'last_closing_date': last_closing_date,
                     'last_closing_price': last_closing_price,

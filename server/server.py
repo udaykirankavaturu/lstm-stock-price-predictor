@@ -29,18 +29,20 @@ def predict():
             # Handle preflight request
             response = jsonify({})
             response.headers.add('Access-Control-Allow-Origin', '*')
-            response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-            response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')
-            return response 
+            response.headers.add(
+                'Access-Control-Allow-Headers', 'Content-Type')
+            response.headers.add(
+                'Access-Control-Allow-Methods', 'GET, OPTIONS')
+            return response
 
         # Get the input data from the request
         data = request.json['data']
 
         if not data:
             return {
-            'status_code': 400,
-            'message': 'data is required'
-        }
+                'status_code': 400,
+                'message': 'data is required'
+            }
 
         if 'symbol' not in data:
             return {
@@ -62,7 +64,7 @@ def predict():
 
         if exchange == 'SHANGHAI':
             symbol = symbol + '.SS'
-        
+
         if exchange == 'SHENZHEN':
             symbol = symbol + '.SZ'
 
@@ -71,7 +73,7 @@ def predict():
 
         if exchange == 'EUROPE':
             symbol = symbol + '.E'
-        
+
         if exchange == 'LONDON':
             symbol = symbol + '.L'
 

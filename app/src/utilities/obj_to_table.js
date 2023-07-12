@@ -1,18 +1,17 @@
 import React from 'react';
 
 const ObjectToTable = ({ object }) => {
+    const formatKey = (key) => {
+        const formattedKey = key.replace(/_/g, ' ');
+        return formattedKey.charAt(0).toUpperCase() + formattedKey.slice(1);
+    };
+
     return (
         <table>
-            <thead>
-                <tr>
-                    <th>Key</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
             <tbody>
                 {Object.entries(object).map(([key, value]) => (
                     <tr key={key}>
-                        <td>{key}</td>
+                        <td>{formatKey(key)}</td>
                         <td>{value}</td>
                     </tr>
                 ))}

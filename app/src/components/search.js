@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import ObjectToTable from '../utilities/obj_to_table';
 import './search.css'
 
+const API_URL = process.env.REACT_APP_API_URL;
+const API_TIMEOUT = parseInt(process.env.REACT_APP_API_TIMEOUT, 10) || 10000; // Default timeout of 10 seconds
+
 const Search = () => {
     const [stockSymbol, setStockSymbol] = useState('');
     const [exchange, setExchange] = useState('NSE');
@@ -15,10 +18,20 @@ const Search = () => {
         setExchange(e.target.value);
     };
 
+
+
     const handleKeyPress = async (e) => {
         if (e.key === 'Enter') {
             try {
-                const response = await fetch('http://127.0.0.1:5000/predict', {
+                const controller = new AbortController();
+                const signal = controller.signal;
+
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                    setSearchResults(<div>Request timed out. Please try again later.</div>);
+                }, API_TIMEOUT);
+
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -27,9 +40,16 @@ const Search = () => {
                         data: {
                             symbol: stockSymbol,
                             exchange: exchange,
-                        }
+                        },
                     }),
+                    signal,
                 });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error('Server Error');
+                }
 
                 const result = await response.json();
                 if (result && result.status_code === 200) {
@@ -42,13 +62,18 @@ const Search = () => {
                             </div>
                         ))
                 }
-
-
             } catch (error) {
-                console.error('Error fetching data:', error);
+                if (error.name === 'AbortError') {
+                    console.error('Request aborted:', error);
+                } else {
+                    console.error('Error fetching data:', error);
+                    setSearchResults(<div>Error fetching data. Please try again later.</div>);
+                }
             }
         }
     };
+
+
 
     return (
         <div className="container">

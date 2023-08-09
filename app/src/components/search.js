@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import ObjectToTable from '../utilities/obj_to_table';
 import './search.css'
 
-const API_URL = process.env.REACT_APP_API_URL;
-const API_TIMEOUT = parseInt(process.env.REACT_APP_API_TIMEOUT, 10) || 10000; // Default timeout of 10 seconds
+const API_URL = process.env.API_URL;
+const API_TIMEOUT = parseInt(process.env.API_TIMEOUT, 10) || 10000; // Default timeout of 10 seconds
 
 const Search = () => {
     const [stockSymbol, setStockSymbol] = useState('');

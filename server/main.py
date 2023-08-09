@@ -1,29 +1,15 @@
-from flask import Flask, request, jsonify
-from flask import Flask
-from flask_cors import CORS
-import tensorflow as tf
-import numpy as np
-import yfinance as yf
-from sklearn.preprocessing import MinMaxScaler
 from datetime import datetime, timedelta
+from sklearn.preprocessing import MinMaxScaler
+import yfinance as yf
+import numpy as np
+from flask import request, jsonify
+import os
+import tensorflow as tf
 
-
-app = Flask(__name__)
-CORS(app)
-
-# Load the LSTM model
-model_path = '../model'
-model = tf.keras.models.load_model(model_path)
-model.summary()
-
-# create scaler
 scaler = MinMaxScaler(feature_range=(0, 1))
 
-# Define a route for prediction
 
-
-@app.route('/predict', methods=['POST'])
-def predict():
+def predict(request):
     try:
         if request.method == 'OPTIONS':
             # Handle preflight request
@@ -34,21 +20,19 @@ def predict():
             response.headers.add(
                 'Access-Control-Allow-Methods', 'GET, OPTIONS')
             return response
+        
+        headers = {'Access-Control-Allow-Origin': '*'}
+
+        request_json = request.get_json(silent=True)
 
         # Get the input data from the request
-        data = request.json['data']
+        data = request_json['data']
 
         if not data:
-            return {
-                'status_code': 400,
-                'message': 'data is required'
-            }
+            return ('Invalid request', 400, headers)
 
         if 'symbol' not in data:
-            return {
-                'status_code': 400,
-                'message': 'symbol is required'
-            }
+            return ('Symbol required', 400, headers)
 
         symbol = data['symbol']
         exchange = data['exchange']
@@ -92,11 +76,13 @@ def predict():
             stock_data = np.reshape(stock_data, (1, stock_data.shape[0], 4))
             stock_data = np.array(stock_data[:, -3324:])
 
+            # load model
+            model = tf.keras.models.load_model('./model')
+
             # Perform prediction using the loaded model
             predictions = model.predict(stock_data)
 
-            # Postprocess the predictions (if required)
-            # ...
+            # Postprocess the predictions
             predictions = scaler.inverse_transform(predictions)
             predictions = predictions.tolist()
             next_predicted_closing_price = round(predictions[0][-1], 2)
@@ -112,23 +98,8 @@ def predict():
                     'last_closing_price': last_closing_price,
                     'next_predicted_closing_price': next_predicted_closing_price}
             }
-
-            return jsonify(response)
+            return (jsonify(response),200,headers)
         else:
-            return {
-                'status_code': 200,
-                'message': 'No data found',
-                'data': {}
-            }
+            return ('No data found',200,headers)
     except Exception as error:
-        return {
-            'status_code': 200,
-            'message': 'Server error',
-            'data': {
-                error: error
-            }
-        }
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
+        return (f'Server error: {error}',500)

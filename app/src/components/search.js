@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import ObjectToTable from '../utilities/obj_to_table';
 import './search.css'
+import About from './about';
 
-const API_URL = process.env.API_URL;
-const API_TIMEOUT = parseInt(process.env.API_TIMEOUT, 10) || 10000; // Default timeout of 10 seconds
+const API_URL = process.env.REACT_APP_API_URL;
+const API_TIMEOUT = parseInt(process.env.REACT_APP_API_TIMEOUT, 10) || 10000; // Default timeout of 10 seconds
 
 const Search = () => {
     const [stockSymbol, setStockSymbol] = useState('');
     const [exchange, setExchange] = useState('NSE');
     const [searchResults, setSearchResults] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSymbolChange = (e) => {
         setStockSymbol(e.target.value);
@@ -30,7 +32,7 @@ const Search = () => {
                     controller.abort();
                     setSearchResults(<div>Request timed out. Please try again later.</div>);
                 }, API_TIMEOUT);
-
+                setIsLoading(true);
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -69,6 +71,8 @@ const Search = () => {
                     console.error('Error fetching data:', error);
                     setSearchResults(<div>Error fetching data. Please try again later.</div>);
                 }
+            } finally{
+                setIsLoading(false);
             }
         }
     };
@@ -77,6 +81,7 @@ const Search = () => {
 
     return (
         <div className="container">
+            <About />
             <div className="select-input-container">
                 <select value={exchange} onChange={handleExchangeChange}>
                     <option value="NSE">NSE</option>
@@ -96,11 +101,15 @@ const Search = () => {
                     onChange={handleSymbolChange}
                     onKeyDown={handleKeyPress}
                     tabIndex="0"
+                    disabled={isLoading}
                 />
-                <br></br>
             </div>
-            <div className="search-results">
-                {searchResults}
+            <div>
+                    {isLoading 
+                    ? ( <div className="loader" /> ) 
+                    : ( <div className="search-results">
+                            {searchResults}
+                        </div> )}
             </div>
         </div>
     );

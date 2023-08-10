@@ -1,16 +1,10 @@
 import React from 'react';
+import './navbar.css';
 
 const Navbar = () => {
     return (
         <nav>
-            <ul>
-                <li>
-                    <a href="/">Home</a>
-                </li>
-                <li>
-                    <a href="/about">About</a>
-                </li>
-            </ul>
+            <h1>Stock Price Predictor</h1>
         </nav>
     );
 };

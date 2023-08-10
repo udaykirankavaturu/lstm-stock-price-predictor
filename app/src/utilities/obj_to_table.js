@@ -11,7 +11,7 @@ const ObjectToTable = ({ object }) => {
             <tbody>
                 {Object.entries(object).map(([key, value]) => (
                     <tr key={key}>
-                        <td>{formatKey(key)}</td>
+                        <td><b>{formatKey(key)}</b></td>
                         <td>{value}</td>
                     </tr>
                 ))}
